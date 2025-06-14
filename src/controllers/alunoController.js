@@ -91,10 +91,32 @@ const alunoController = {
         }
     },
 
-    deletarAluno: (req, res) => {
-        const { ID_Aluno } = req.params;
+    deletarAluno: async (req, res) => {
+        
+        try {
+            const { ID_Aluno } = req.params;
+    
+            let aluno = await alunoModel.findByPk(ID_Aluno);
+    
+            if (!aluno) {
+                return res.status(404).json({ message: "Aluno não encontrado!" })
+            }
+            
+            let nomeAluno = aluno.nomeAluno;
 
-        res.send(`Usuario ${ID_Aluno} foi deletado com sucesso!`);
+            let result = await alunoModel.destroy({where: {ID_Aluno}});
+            
+            if(result > 0 ){
+                return res.status(200).json({message: `o(a) aluno(a) ${nomeAluno} foi excluído com sucesso!`})
+            }else{
+                return res.status(404).json({message:"Erro ao excluir o aluno!"});
+            }
+
+        } catch (error) {
+            console.error("Erro ao excluir o erro", error);
+            return res.status(500).json({message: "erro ao excluir o aluno!"})
+        }
+
     }
 
 };
