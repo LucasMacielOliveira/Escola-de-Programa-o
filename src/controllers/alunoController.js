@@ -70,7 +70,7 @@ const alunoController = {
                     }
                 });
 
-                if (!aluno) {
+                if (aluno) {
                     return res.status(409).json({ message: "CPF ou E-mail em duplicidade" });
                 }
             };
