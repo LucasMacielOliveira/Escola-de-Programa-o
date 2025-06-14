@@ -60,7 +60,23 @@ const alunoController = {
                 return res.status(404).json({ message: "Aluno não existe!" })
             }
 
-            let dadosAtualizados = {nomeAluno, cpfAluno, dataNascimentoAluno, emailAluno, telefoneAluno, enderecoAluno};
+            if (cpfAluno || emailAluno) {
+                aluno = await alunoModel.findOne({
+                    where: {
+                        [Op.or]: [
+                            { cpfAluno },
+                            { emailAluno }
+                        ]
+                    }
+                });
+
+                if (!aluno) {
+                    return res.status(409).json({ message: "CPF ou E-mail em duplicidade" });
+                }
+            };
+
+
+            let dadosAtualizados = { nomeAluno, cpfAluno, dataNascimentoAluno, emailAluno, telefoneAluno, enderecoAluno };
 
             await alunoModel.update(dadosAtualizados, { where: { ID_Aluno } });
 
@@ -71,7 +87,7 @@ const alunoController = {
         } catch (error) {
             console.error("erro ao atualizar o aluno!", error);
 
-            res.status(500).json({message: "erro ao atualizar o aluno"})
+            res.status(500).json({ message: "erro ao atualizar o aluno" })
         }
     },
 
