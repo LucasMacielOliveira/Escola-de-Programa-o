@@ -1,11 +1,24 @@
 const { alunoModel } = require('../models/alunoModels');
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
+const {parseDateDB} = require('../Utils/dateUtils');
 
 const alunoController = {
     listarAlunos: async (req, res) => {
         try {
             let alunos = await alunoModel.findAll();
+            
+
+            // Mapeia o array de alunos para ajustar a data ede nascimento de cada aluno
+            //Utiliza a função  parseDateBd para corrigir possiveis problemas de fuso horario
+            //Retorna um novo array com as datas corrigidas
+
+            alunos = alunos.map(aluno => {
+                aluno.dataNascimentoAluno = parseDateDB(aluno.dataNascimentoAluno);
+                return aluno;
+            });
+            
             return res.status(200).json(alunos);
+
 
         } catch (error) {
             console.error("Erro ao listar alunos:", error);
@@ -122,3 +135,4 @@ const alunoController = {
 };
 
 module.exports = { alunoController };
+
