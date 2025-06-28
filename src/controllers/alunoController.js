@@ -5,8 +5,26 @@ const { parseDateBd } = require('../Utils/dateUtils');
 const alunoController = {
     listarAlunos: async (req, res) => {
         try {
-            let alunos = await alunoModel.findAll();
+            let {ID_Aluno, nomeAluno} = req.query;
 
+            let conditions = {};
+            
+            
+            if(ID_Aluno){
+                conditions.ID_Aluno = ID_Aluno;
+            }
+
+            if (nomeAluno) {
+                conditions.nomeAluno = nomeAluno;
+            }
+
+            let alunos = await alunoModel.findAll({
+                where: {
+                    [Op.or]:[
+                        {ID_Aluno: {[Op.eq]: conditions.ID_Aluno}},
+                        {nomeAluno: {[Op.substring]: conditions.nomeAluno}}
+                    ]
+                }});
 
             // Mapeia o array de alunos para ajustar a data ede nascimento de cada aluno
             //Utiliza a função  parseDateBd para corrigir possiveis problemas de fuso horario
